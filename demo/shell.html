@@ -3,13 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Play a classic Doom-style first-person shooter in your browser. No download needed: Doom Generic runs on WebAssembly with Freedoom game data.">
+  <meta name="description" content="Play a free Doom-style first-person shooter online. Choose Freedoom Phase 1, Phase 2, or FreeDM and play in your browser with no install or account.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
   <meta name="theme-color" content="#11120f">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Play Classic Doom in Your Browser | Doom Generic">
-  <meta property="og:description" content="Jump into a classic Doom-style shooter. Free to play in your browser, powered by WebAssembly and Freedoom.">
+  <meta property="og:site_name" content="Doom Generic">
+  <meta property="og:title" content="Play Doom Online Free — Classic FPS | Doom Generic">
+  <meta property="og:description" content="A free Doom-style FPS you can play in your browser. Choose Freedoom Phase 1, Phase 2, or FreeDM; no install or account required.">
   <meta name="twitter:card" content="summary">
-  <title>Play Classic Doom in Your Browser — Doom Generic</title>
+  <meta name="vercel-seo-marker">
+  <title>Play Doom Online Free — Classic FPS | Doom Generic</title>
   <style>
     :root {
       color-scheme: dark;
@@ -66,6 +70,7 @@
     .save-actions button:disabled { opacity: .45; }
     .save-note { margin: 0 0 0 .3rem; color: var(--muted); font-size: .78rem; }
     .how-to-play { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .7rem 1.5rem; padding: 1rem .15rem 0; }
+    .help-title { margin: 0 0 .3rem; font-size: .85rem; font-weight: 700; letter-spacing: -.01em; }
     .how-to-play p { margin: 0; color: var(--muted); font-size: .82rem; }
     .keys { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
     kbd { display: inline-block; min-width: 1.75rem; padding: .1rem .35rem; border: 1px solid #333a45; border-radius: 4px; background: #171b22; color: #d7dce3; font: 650 .7rem/1.5 ui-monospace, monospace; text-align: center; }
@@ -93,8 +98,8 @@
     <div class="brand" aria-label="Doom Generic"><span class="brand-mark" aria-hidden="true">DG</span> Doom Generic</div>
     <header class="intro">
       <p class="eyebrow">Free browser game</p>
-      <h1>Classic Doom.<br>Ready when you are.</h1>
-      <p>Choose a game, press Play, and jump in. No install required.</p>
+      <h1>Play Classic Doom Online</h1>
+      <p>A free Doom-style FPS in your browser. Choose a game and press Play—no install or account required.</p>
     </header>
 
     <section class="game-frame" aria-label="Play Doom Generic">
@@ -131,6 +136,7 @@
 
     <section class="how-to-play" aria-label="How to play">
       <div>
+        <h2 class="help-title">How to play</h2>
         <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> Move <kbd>←</kbd><kbd>→</kbd> Turn <kbd>Ctrl</kbd> Fire <kbd>Space</kbd> Use <kbd>Enter</kbd> Start</p>
       </div>
       <p>Click the game once for audio. Saves stay in this browser.</p>

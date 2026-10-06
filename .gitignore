@@ -22,3 +22,5 @@ demo/doom.js
 demo/doom.wasm
 demo/doom.data
 demo/wads/
+dist/
+.vercel/
