@@ -212,6 +212,7 @@ void DG_SetWindowTitle(const char * title)
 
 int main(int argc, char **argv)
 {
+    SDL_setenv("TIMIDITY_CFG", "/timidity.cfg", 1);
     doomgeneric_Create(argc, argv);
 
     emscripten_set_main_loop(doomgeneric_Tick, 0, 1);

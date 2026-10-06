@@ -11,3 +11,13 @@ Release/
 Build/
 doomgeneric
 doomgeneric.map
+doomgeneric/freedoom*.wad
+doomgeneric/freedoom-*.zip
+doomgeneric/dgguspat-*.zip
+doomgeneric/dgguspat/
+doomgeneric/timidity.cfg
+doomgeneric/build/
+demo/doom.html
+demo/doom.js
+demo/doom.wasm
+demo/doom.data
