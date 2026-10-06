@@ -15,7 +15,7 @@ Open <http://localhost:8000/demo/doom.html>. First-time visitors choose Phase 1,
 
 ## Deploy to Vercel
 
-Import this repository into Vercel and deploy. `vercel.json` installs the pinned Emscripten SDK, builds the game, and publishes the static site. `VERCEL_PROJECT_PRODUCTION_URL` supplies canonical metadata and a sitemap; set `SITE_URL` to your public HTTPS domain if system variables are unavailable. The WAD files are included in deployment but downloaded by a visitor only after choosing Play.
+Import this repository into Vercel and deploy. The build installs pinned Emscripten, builds the game, and publishes the static site. Vercel caches the compiler downloads, Emscripten ports, and Freedoom assets between builds. `VERCEL_PROJECT_PRODUCTION_URL` supplies canonical metadata and a sitemap; set `SITE_URL` to your public HTTPS domain if system variables are unavailable. Visitors download a WAD only after choosing Play.
 
 ## Controls
 

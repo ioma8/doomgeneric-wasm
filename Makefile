@@ -13,17 +13,20 @@ $(FREEDOOM_ZIP):
 doomgeneric/freedoom1.wad: $(FREEDOOM_ZIP)
 	unzip -oq $(FREEDOOM_ZIP) freedoom-$(FREEDOOM_VERSION)/freedoom1.wad -d doomgeneric
 	mv doomgeneric/freedoom-$(FREEDOOM_VERSION)/freedoom1.wad doomgeneric/freedoom1.wad
+	touch $@
 	rmdir doomgeneric/freedoom-$(FREEDOOM_VERSION)
 
 doomgeneric/freedoom2.wad: $(FREEDOOM_ZIP)
 	unzip -oq $(FREEDOOM_ZIP) freedoom-$(FREEDOOM_VERSION)/freedoom2.wad -d doomgeneric
 	mv doomgeneric/freedoom-$(FREEDOOM_VERSION)/freedoom2.wad $@
+	touch $@
 	rmdir doomgeneric/freedoom-$(FREEDOOM_VERSION)
 
 doomgeneric/freedm.wad:
 	curl -fL https://github.com/freedoom/freedoom/releases/download/v$(FREEDOOM_VERSION)/freedm-$(FREEDOOM_VERSION).zip -o $(FREEDM_ZIP)
 	unzip -oq $(FREEDM_ZIP) freedm-$(FREEDOOM_VERSION)/freedm.wad -d doomgeneric
 	mv doomgeneric/freedm-$(FREEDOOM_VERSION)/freedm.wad $@
+	touch $@
 	rmdir doomgeneric/freedm-$(FREEDOOM_VERSION)
 
 demo/wads/freedoom1.wad: doomgeneric/freedoom1.wad
