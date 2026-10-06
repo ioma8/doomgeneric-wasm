@@ -8,7 +8,7 @@ endif
 
 CC=emcc
 CFLAGS+=-O2 -DFEATURE_SOUND -sUSE_SDL=2 -sUSE_SDL_MIXER=2 -sSDL2_MIXER_FORMATS='["mid"]'
-LDFLAGS+=-sALLOW_MEMORY_GROWTH=1 -sEXIT_RUNTIME=0 -sFORCE_FILESYSTEM=1 -sEXPORTED_RUNTIME_METHODS=FS,addRunDependency,removeRunDependency --preload-file timidity.cfg@/timidity.cfg --preload-file dgguspat@/dgguspat --shell-file ../demo/shell.html
+LDFLAGS+=-sALLOW_MEMORY_GROWTH=1 -sEXIT_RUNTIME=0 -sFORCE_FILESYSTEM=1 -sEXPORTED_FUNCTIONS=_main,_M_WebQuickSave,_M_WebQuickLoad -sEXPORTED_RUNTIME_METHODS=FS,addRunDependency,removeRunDependency,ccall --preload-file timidity.cfg@/timidity.cfg --preload-file dgguspat@/dgguspat --shell-file ../demo/shell.html
 LIBS+=-lm
 
 # subdirectory for objects

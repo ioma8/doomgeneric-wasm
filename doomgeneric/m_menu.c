@@ -629,6 +629,33 @@ void M_DoSave(int slot)
 	quickSaveSlot = slot;
 }
 
+// Browser buttons use a predictable slot for quick saves across page reloads.
+int M_WebQuickSave(void)
+{
+    if (!usergame || gamestate != GS_LEVEL)
+	return 0;
+
+    M_ReadSaveStrings();
+    quickSaveSlot = 0;
+    M_StringCopy(savegamestrings[0], "Quick Save", SAVESTRINGSIZE);
+    M_DoSave(0);
+    return 1;
+}
+
+int M_WebQuickLoad(void)
+{
+    if (netgame)
+	return 0;
+
+    M_ReadSaveStrings();
+    if (!strcmp(savegamestrings[0], EMPTYSTRING))
+	return 0;
+
+    quickSaveSlot = 0;
+    M_LoadSelect(0);
+    return 1;
+}
+
 //
 // User wants to save. Start string input for M_Responder
 //
@@ -2122,4 +2149,3 @@ void M_Init (void)
 
     //opldev = M_CheckParm("-opldev") > 0;
 }
-
