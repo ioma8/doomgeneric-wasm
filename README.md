@@ -1,6 +1,6 @@
 # Doom Generic · WebAssembly
 
-Play Doom Generic in your browser, compiled to WebAssembly with sound effects and MIDI music. The demo uses the freely licensed [Freedoom Phase 1](https://freedoom.github.io/download.html) game data.
+Play Doom Generic in your browser, compiled to WebAssembly with freely licensed Freedoom game data.
 
 ## Run
 
@@ -11,7 +11,7 @@ make wasm
 make serve
 ```
 
-Open <http://localhost:8000/demo/doom.html>. Game data, [GUS MIDI patches](https://github.com/redddcyclone/dgguspat), and WASM files are generated locally. Click the game and press Enter; browsers require a user interaction to enable audio. Headless Chrome confirmed the game loads and the audio context starts, but audible output remains unverified. Serve over HTTP; `file://` URLs will not work.
+Open <http://localhost:8000/demo/doom.html>. First-time visitors choose Phase 1, Phase 2, or FreeDM and press Play to download that WAD. Returning visitors automatically load their last game, using the browser cache when available. Switching games restarts the run; save slots stay in browser local storage, separately for each game. Game data, [GUS MIDI patches](https://github.com/redddcyclone/dgguspat), and WASM files are generated locally. Serve over HTTP; `file://` URLs will not work.
 
 ## Controls
 

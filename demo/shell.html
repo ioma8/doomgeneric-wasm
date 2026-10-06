@@ -3,36 +3,273 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Doom Generic · WebAssembly</title>
+  <meta name="description" content="Play a classic Doom-style first-person shooter in your browser. No download needed: Doom Generic runs on WebAssembly with Freedoom game data.">
+  <meta name="theme-color" content="#11120f">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Play Classic Doom in Your Browser | Doom Generic">
+  <meta property="og:description" content="Jump into a classic Doom-style shooter. Free to play in your browser, powered by WebAssembly and Freedoom.">
+  <meta name="twitter:card" content="summary">
+  <title>Play Classic Doom in Your Browser — Doom Generic</title>
   <style>
-    :root { color-scheme: dark; font: 16px/1.5 system-ui, sans-serif; background: #111; color: #eee; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 2rem; box-sizing: border-box; }
-    main { width: min(100%, 960px); }
-    h1 { margin: 0 0 .25rem; font-size: clamp(1.5rem, 4vw, 2.5rem); }
-    p { color: #aaa; margin: .25rem 0 1rem; }
-    #canvas { width: 100%; aspect-ratio: 8 / 5; display: block; background: #000; image-rendering: pixelated; outline: none; }
-    button { margin-top: .75rem; padding: .55rem .9rem; border: 1px solid #555; border-radius: .35rem; background: #222; color: #eee; font: inherit; cursor: pointer; }
-    #status { min-height: 1.5em; color: #aaa; font-size: .9rem; }
-    kbd { color: #fff; }
+    :root {
+      color-scheme: dark;
+      font: 16px/1.55 system-ui, sans-serif;
+      background: #11120f;
+      color: #f4f0e7;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --muted: #aaa99f;
+      --line: #34352d;
+      --accent: #f2763d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at 50% 0%, #332019 0, #171612 38rem, #11120f 75rem);
+    }
+    main { width: min(100% - 2rem, 1060px); margin: 0 auto; padding: 2.5rem 0 3rem; }
+    .brand { display: flex; align-items: center; gap: .7rem; color: #ded8cb; font-size: .8rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    .brand-mark { display: grid; width: 2rem; height: 2rem; place-items: center; border: 1px solid #75412e; color: var(--accent); font-size: 1rem; }
+    .intro { padding: 2.5rem 0 1.5rem; text-align: center; }
+    .eyebrow { margin: 0 0 .5rem; color: var(--accent); font-size: .75rem; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; }
+    h1 { margin: 0; font-size: clamp(2.2rem, 7vw, 4.5rem); line-height: 1.05; letter-spacing: -.055em; }
+    .intro > p:not(.eyebrow) { max-width: 42rem; margin: 1rem auto 0; color: #c0bdb2; font-size: clamp(1rem, 2.5vw, 1.15rem); }
+    .play-link { margin-top: 1.25rem; padding: .7rem 1rem; border: 1px solid #945033; border-radius: 2px; background: #6f321f; color: #fff5e9; font-size: .85rem; font-weight: 750; }
+    .play-link:hover { background: #8d4126; }
+    .play-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .game-frame { overflow: hidden; border: 1px solid #504138; background: #080908; box-shadow: 0 24px 80px #0009, 0 0 0 5px #ffffff05; }
+    .frame-bar { display: flex; min-height: 3.2rem; align-items: center; justify-content: space-between; gap: 1rem; padding: .5rem .9rem; border-bottom: 1px solid #34332c; color: var(--muted); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; }
+    .game-choice { display: flex; align-items: center; gap: .65rem; }
+    select { max-width: 100%; padding: .4rem .6rem; border: 1px solid #45443c; border-radius: 2px; background: #1c1b17; color: #eee8dc; font: inherit; letter-spacing: normal; text-transform: none; }
+    .live { display: inline-flex; align-items: center; gap: .45rem; }
+    .live::before { width: .45rem; height: .45rem; border-radius: 50%; background: #87b96c; content: ""; box-shadow: 0 0 10px #87b96c88; }
+    #canvas { display: block; width: 100%; aspect-ratio: 8 / 5; background: #000; image-rendering: pixelated; outline: none; }
+    .below-game { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem .9rem; border-top: 1px solid #34332c; }
+    #status { min-height: 1.5em; color: #d5d1c5; font-size: .85rem; }
+    button { flex: 0 0 auto; padding: .55rem .85rem; border: 1px solid #945033; border-radius: 2px; background: #6f321f; color: #fff5e9; font: inherit; font-size: .82rem; font-weight: 700; cursor: pointer; }
+    button:hover { background: #8d4126; }
+    button:focus-visible, #canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .how-to-play { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.7rem 0 0; }
+    h2 { margin: 0 0 .6rem; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; }
+    .how-to-play p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .keys { display: flex; flex-wrap: wrap; gap: .45rem; }
+    kbd { display: inline-block; min-width: 2rem; padding: .18rem .45rem; border: 1px solid #45443c; border-bottom-width: 2px; border-radius: 3px; color: #e8e2d5; font: 700 .76rem/1.5 ui-monospace, monospace; text-align: center; }
+    footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--line); color: #8e8d84; font-size: .75rem; text-align: center; }
+    a { color: #d9a181; }
+    @media (max-width: 600px) {
+      main { width: min(100% - 1rem, 1060px); padding-top: 1rem; }
+      .intro { padding: 2rem 0 1.2rem; }
+      .frame-bar { align-items: flex-start; flex-direction: column; }
+      .how-to-play { grid-template-columns: 1fr; gap: 1.1rem; padding: 1.2rem .25rem 0; }
+      .below-game { align-items: flex-start; flex-direction: column; }
+      button { width: 100%; }
+    }
   </style>
 </head>
 <body>
   <main>
-    <h1>Doom Generic</h1>
-    <p>Classic Doom engine compiled to WebAssembly, running Freedoom Phase 1.</p>
-    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="0"></canvas>
-    <button onclick="document.getElementById('canvas').requestFullscreen()">Fullscreen</button>
-    <div id="status">Loading game data…</div>
-    <p>Click the game and press <kbd>Enter</kbd> to start. Move: <kbd>↑</kbd><kbd>↓</kbd> or <kbd>W</kbd><kbd>S</kbd> · Turn: <kbd>←</kbd><kbd>→</kbd> · Fire: <kbd>Ctrl</kbd> · Use: <kbd>Space</kbd></p>
+    <div class="brand" aria-label="Doom Generic"><span class="brand-mark" aria-hidden="true">DG</span> Doom Generic</div>
+    <header class="intro">
+      <p class="eyebrow">Classic first-person action · Play free</p>
+      <h1>Classic Doom.<br>Right in your browser.</h1>
+      <p>Drop into a fast, old-school shooter. No download or install—just load the game and play.</p>
+      <button class="play-link" id="play-game" type="button">Play Phase 1 ↓</button>
+    </header>
+
+    <section class="game-frame" aria-label="Play Doom Generic">
+      <div class="frame-bar">
+        <label class="game-choice" for="game-select">Game
+          <select id="game-select">
+            <option value="freedoom1">Freedoom · Phase 1</option>
+            <option value="freedoom2">Freedoom · Phase 2</option>
+            <option value="freedm">FreeDM · Deathmatch maps</option>
+          </select>
+        </label>
+        <span class="live">WebAssembly</span>
+      </div>
+      <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="0" aria-label="Doom game screen"></canvas>
+      <div class="below-game">
+        <div id="status" role="status" aria-live="polite">Loading game engine…</div>
+        <button type="button" onclick="document.getElementById('canvas').requestFullscreen()">Fullscreen</button>
+      </div>
+    </section>
+
+    <section class="how-to-play" aria-label="How to play">
+      <div>
+        <h2>Start playing</h2>
+        <p>First visit? Choose a game and press Play to download it. On return, your last loaded game downloads automatically. You can switch games any time; switching restarts the run, while saves stay separate. Click the game and press Enter to start.</p>
+      </div>
+      <div>
+        <h2>Controls</h2>
+        <p class="keys"><kbd>↑</kbd><kbd>↓</kbd> Move <kbd>←</kbd><kbd>→</kbd> Turn <kbd>Ctrl</kbd> Fire <kbd>Space</kbd> Use</p>
+        <p>Save and load from the in-game menu. Save slots stay in this browser and are kept separate for each game.</p>
+      </div>
+    </section>
+
+    <footer>
+      Runs locally in your browser with WebAssembly. Game data: <a href="https://freedoom.github.io/">Freedoom</a>.
+    </footer>
   </main>
   <script>
     var statusElement = document.getElementById('status');
+    var wadSelect = document.getElementById('game-select');
+    var playButton = document.getElementById('play-game');
+    var wadChoices = ['freedoom1', 'freedoom2', 'freedm'];
+    var lastLoadedWad;
+    var nextWad;
+    var savedWad;
+    try {
+      lastLoadedWad = localStorage.getItem('doomgeneric:last-loaded-game');
+      nextWad = localStorage.getItem('doomgeneric:next-game');
+      savedWad = localStorage.getItem('doomgeneric:game');
+    } catch (_) {}
+    var resumeLastGame = wadChoices.includes(nextWad) || wadChoices.includes(lastLoadedWad);
+    var wadId = wadChoices.includes(nextWad) ? nextWad : (resumeLastGame ? lastLoadedWad : (wadChoices.includes(savedWad) ? savedWad : 'freedoom1'));
+    wadSelect.value = wadId;
+    var wadFile = wadId + '.wad';
+    var savePrefix = 'doomgeneric:saves:' + wadId + ':';
+    var fs;
+    var runtimeReady = false;
+    var startRequested = false;
+    var loadingWad = false;
+    var gameStarted = false;
+    var loadedWadId;
+    function updatePlayButton() {
+      playButton.textContent = 'Play ' + wadSelect.options[wadSelect.selectedIndex].text.replace(' · ', ' ') + ' ↓';
+    }
+    wadSelect.addEventListener('change', () => {
+      if (gameStarted) {
+        var nextGame = wadSelect.value;
+        if (!confirm('Switch games and restart? Your save slots will be kept.')) {
+          wadSelect.value = loadedWadId;
+          return;
+        }
+        try { localStorage.setItem('doomgeneric:next-game', nextGame); } catch (_) {}
+        location.reload();
+        return;
+      }
+      wadId = wadSelect.value;
+      wadFile = wadId + '.wad';
+      savePrefix = 'doomgeneric:saves:' + wadId + ':';
+      try {
+        localStorage.setItem('doomgeneric:game', wadId);
+        localStorage.removeItem('doomgeneric:next-game');
+      } catch (_) {}
+      updatePlayButton();
+    });
+    updatePlayButton();
+    function storeSave(path) {
+      var match = path.match(/(?:^|\/)\.savegame\/(doomsav[0-9]\.dsg)$/);
+      if (!match) return;
+      try {
+        var bytes = Module.FS.readFile(path);
+        var binary = '';
+        for (var i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+        localStorage.setItem(savePrefix + match[1], btoa(binary));
+      } catch (error) { console.warn('Could not store this save in browser storage.', error); }
+    }
+    function restoreSaves() {
+      for (var slot = 0; slot < 10; slot++) {
+        var name = 'doomsav' + slot + '.dsg';
+        try {
+          var encoded = localStorage.getItem(savePrefix + name);
+          if (encoded) fs.writeFile('/.savegame/' + name, Uint8Array.from(atob(encoded), char => char.charCodeAt(0)));
+        } catch (error) { console.warn('Could not restore browser save ' + name, error); }
+      }
+    }
+    function requestPlay() {
+      if (gameStarted || loadingWad) return;
+      startRequested = true;
+      playButton.disabled = true;
+      wadSelect.disabled = true;
+      statusElement.textContent = runtimeReady ? 'Starting download…' : 'Preparing the game engine…';
+      if (runtimeReady) loadSelectedWad();
+    }
+    async function loadSelectedWad() {
+      if (!startRequested || !runtimeReady || loadingWad) return;
+      loadingWad = true;
+      restoreSaves();
+      statusElement.textContent = 'Downloading ' + wadSelect.options[wadSelect.selectedIndex].text + '…';
+      try {
+        var response = await fetch('wads/' + wadFile, { cache: 'force-cache' });
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        var total = Number(response.headers.get('content-length'));
+        var bytes;
+        if (!response.body || !response.body.getReader || !total) {
+          bytes = new Uint8Array(await response.arrayBuffer());
+        } else {
+          var reader = response.body.getReader();
+          var chunks = [];
+          var received = 0;
+          while (true) {
+            var chunk = await reader.read();
+            if (chunk.done) break;
+            chunks.push(chunk.value);
+            received += chunk.value.length;
+            statusElement.textContent = 'Downloading ' + wadSelect.options[wadSelect.selectedIndex].text + '… ' + Math.floor(received * 100 / total) + '%';
+          }
+          bytes = new Uint8Array(received);
+          var offset = 0;
+          for (var part of chunks) { bytes.set(part, offset); offset += part.length; }
+        }
+        restoreSaves();
+        fs.writeFile('/' + wadFile, bytes);
+        Module.arguments.splice(0, Module.arguments.length, '-iwad', '/' + wadFile);
+        gameStarted = true;
+        loadedWadId = wadId;
+        wadSelect.disabled = false;
+        try {
+          localStorage.setItem('doomgeneric:last-loaded-game', wadId);
+          localStorage.setItem('doomgeneric:game', wadId);
+          localStorage.removeItem('doomgeneric:next-game');
+        } catch (_) {}
+        playButton.textContent = 'Game ready';
+        statusElement.textContent = 'Ready — click the game and press Enter to play.';
+        Module.removeRunDependency('selected-wad');
+      } catch (error) {
+        console.error('WAD load failed:', error);
+        startRequested = false;
+        playButton.disabled = false;
+        wadSelect.disabled = false;
+        playButton.textContent = 'Retry download';
+        statusElement.textContent = 'Could not download the WAD. Press Play to retry.';
+      } finally {
+        loadingWad = false;
+      }
+    }
+    playButton.addEventListener('click', requestPlay);
     var Module = {
       canvas: document.getElementById('canvas'),
+      arguments: [],
+      preRun: [function () {
+        fs = Module.FS;
+        if (!fs.analyzePath('/.savegame').exists) fs.mkdir('/.savegame');
+        var rename = fs.rename.bind(fs);
+        fs.rename = function (oldPath, newPath) {
+          var result = rename(oldPath, newPath);
+          storeSave(newPath);
+          return result;
+        };
+        var unlink = fs.unlink.bind(fs);
+        fs.unlink = function (path) {
+          var match = path.match(/(?:^|\/)\.savegame\/(doomsav[0-9]\.dsg)$/);
+          if (match) { try { localStorage.removeItem(savePrefix + match[1]); } catch (_) {} }
+          return unlink(path);
+        };
+        Module.addRunDependency('selected-wad');
+        runtimeReady = true;
+        if (resumeLastGame) requestPlay();
+        else if (startRequested) loadSelectedWad();
+        else statusElement.textContent = 'Engine ready — choose a game and press Play to download it.';
+      }],
       print: (...args) => console.log(...args),
       printErr: (...args) => console.error(...args),
       setStatus: text => { statusElement.textContent = text; },
-      monitorRunDependencies: left => { if (left) statusElement.textContent = 'Loading game data…'; else statusElement.textContent = 'Ready — click the game to play.'; }
+      monitorRunDependencies: left => {
+        if (left) statusElement.textContent = runtimeReady && !gameStarted ? 'Engine ready — press Play to download the selected game.' : 'Loading game engine…';
+        else statusElement.textContent = 'Ready — click the game and press Enter to play.';
+      }
     };
   </script>
   {{{ SCRIPT }}}
