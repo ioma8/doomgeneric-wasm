@@ -58,7 +58,8 @@
 #include <linux/input.h>
 #include <linux/input-event-codes.h>
 #include <linux/fb.h>
-
+#include <linux/kd.h>
+#include <signal.h>
 #include <stdbool.h>
 
 #define KEYQUEUE_SIZE 16
@@ -75,6 +76,8 @@ static struct timeval startTime;
 // framebuffer stuff 
 static uint8_t *fbPtr;
 static int fbFd;
+static int ttyFd = -1;
+static int savedTtyMode;
 static unsigned int fbWidth, fbHeight, fbStride, fbBytesPerPixel, fbOffsetX, fbOffsetY;
 
 // input stuff
@@ -404,6 +407,24 @@ static void checkInputDevs() {
 	closedir(dir);
 }
 
+
+static void RestoreVtMode(void)
+{
+	if (ttyFd < 0)
+		return;
+
+	ioctl(ttyFd, KDSETMODE, savedTtyMode);
+	close(ttyFd);
+	ttyFd = -1;
+}
+
+static void signal_handler(int sig)
+{
+	RestoreVtMode();
+	signal(sig, SIG_DFL);
+	raise(sig);
+}
+
 void DG_Init() {
 	int ret;
 	struct fb_var_screeninfo info;
@@ -444,6 +465,30 @@ void DG_Init() {
 
 	if (!fbPtr)
 		I_Error("Failed to mmap /dev/fb0: %s", strerror(errno));
+	
+
+	ttyFd = open("/dev/tty0", O_RDWR);
+	if (ttyFd < 0)
+		I_Error("Failed to open TTY device: %s", strerror(errno));
+
+	if (ioctl(ttyFd, KDGETMODE, &savedTtyMode) < 0)
+		I_Error("Failed to get TTY mode: %s", strerror(errno));
+
+	// Register cleanup before switching modes, in case no keyboard is found.
+	if (atexit(RestoreVtMode) != 0)
+		I_Error("Failed to register TTY cleanup");
+	signal(SIGINT, signal_handler);
+	signal(SIGTERM, signal_handler);
+	signal(SIGSEGV, signal_handler);
+	signal(SIGABRT, signal_handler);
+
+	if (ioctl(ttyFd, KDSETMODE, KD_GRAPHICS) < 0)
+		I_Error("Failed to set TTY graphics mode: %s", strerror(errno));
+
+	// Some drivers blank the display when switching modes.
+	if (ioctl(fbFd, FBIOBLANK, FB_BLANK_UNBLANK) < 0)
+		fprintf(stderr, "Warning: failed to unblank framebuffer: %s\n", strerror(errno));
+
 
 	// clear the screen
 	memset(fbPtr, 0, fbStride * fbHeight);

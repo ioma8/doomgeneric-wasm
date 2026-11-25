@@ -9,7 +9,6 @@
 Debug/
 Release/
 Build/
-doomgeneric
 doomgeneric.map
 doomgeneric/freedoom*.wad
 doomgeneric/freedoom-*.zip
